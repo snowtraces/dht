@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/shiyanhui/dht"
+	"io"
 	"net/http"
 	_ "net/http/pprof"
+	"os"
 )
 
 type file struct {
@@ -21,7 +23,44 @@ type bitTorrent struct {
 	Length   int    `json:"length,omitempty"`
 }
 
+func Exists(path string) bool {
+	_, err := os.Stat(path) //os.Stat获取文件信息
+	if err != nil {
+		if os.IsExist(err) {
+			return true
+		}
+		return false
+	}
+	return true
+}
+
 func main() {
+	var (
+		fileName = "./dht.log"
+		logFile  *os.File
+		logErr   error
+	)
+
+	func() {
+		//文件是否存在
+		if Exists(fileName) {
+			//使用追加模式打开文件
+			logFile, logErr = os.OpenFile(fileName, os.O_APPEND, 0666)
+			if logErr != nil {
+				fmt.Println("打开文件错误：", logErr)
+				return
+			}
+		} else {
+			//不存在创建文件
+			logFile, logErr = os.Create(fileName)
+			if logErr != nil {
+				fmt.Println("创建失败", logErr)
+				return
+			}
+		}
+	}()
+	defer logFile.Close()
+
 	go func() {
 		http.ListenAndServe(":6060", nil)
 	}()
@@ -62,6 +101,7 @@ func main() {
 			data, err := json.Marshal(bt)
 			if err == nil {
 				fmt.Printf("%s\n\n", data)
+				io.WriteString(logFile, string(data)+"\n")
 			}
 		}
 	}()
