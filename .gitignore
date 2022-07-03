@@ -1,2 +1,5 @@
 .DS_Store
 /.idea/
+dht.log
+*.zip
+*.log
