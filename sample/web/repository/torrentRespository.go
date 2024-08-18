@@ -3,6 +3,7 @@ package handlers
 import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
+	"strings"
 )
 
 type BaseRes struct {
@@ -16,6 +17,7 @@ type Torrent struct {
 	FileName string `json:"file_name" db:"file_name"`
 	Files    string `json:"files" db:"files"`
 	Length   int    `json:"length" db:"length"`
+	Nsfw     int    `json:"nsfw" db:"nsfw"`
 }
 
 // List 列出指定目录下所有文件
@@ -24,9 +26,14 @@ func ListByKeyword(keyword string) []Torrent {
 	defer db.Close()
 
 	var torrents []Torrent
-	e := db.Select(&torrents, "select * from torrent where file_name like ? limit 100;", "%"+keyword+"%")
+	keyword = strings.ReplaceAll(keyword, " ", "%")
+	e := db.Select(&torrents, "select * from torrent where file_name like ? limit 30;", "%"+keyword+"%")
 	if e != nil {
 		return nil
+	}
+
+	if torrents == nil {
+		torrents = make([]Torrent, 0)
 	}
 
 	return torrents

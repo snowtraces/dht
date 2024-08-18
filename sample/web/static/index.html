@@ -17,6 +17,16 @@
             display: none;
         }
 
+        .cover {
+            color: transparent;
+            text-shadow: #111 0 0 5px;
+        }
+
+        .cover:hover {
+            color: inherit;
+            text-shadow: none;
+        }
+
         #top-container {
             width: 100%;
             height: 100px;
@@ -27,13 +37,14 @@
         #result-container {
             width: 100%;
             height: calc(100vh - 100px);
-            background: #eee;
+            background: #f4f4f4;
             padding: 30px;
             overflow: auto;
+            overflow-y: scroll;
         }
 
         .top-search {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
@@ -45,7 +56,7 @@
         }
 
         .result-list {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
@@ -59,6 +70,8 @@
 
         .item-title {
             max-width: calc(100% - 150px);
+            word-wrap: break-word;
+            word-break: break-all;
         }
 
         .item-btn > div {
@@ -68,21 +81,86 @@
 
         .item-detail {
             max-height: 300px;
-            overflow: auto;
-            background: #ddd;
+            overflow-y: scroll;
+            background: #e3e3e3;
+            margin: 0 6px;
         }
 
-        .detail-meta {
+        .detail-this {
             display: flex;
             justify-content: space-between;
             font-size: 12px;
             padding: 10px;
         }
 
-        .detail-meta:nth-child(even) {
-            background: #e3e3e3;
+        .detail-title {
+            max-width: calc(100% - 60px);
+            word-wrap: break-word;
+            word-break: break-all;
         }
 
+        .detail-this:hover {
+           color: red;
+        }
+
+        .click-able {
+            cursor: pointer;
+        }
+
+        .detail-meta:nth-child(even) {
+            background: #eeeeee;
+        }
+
+        .size-tag {
+            border: 1px solid #000;
+            border-radius: 3px;
+        }
+
+        .size-tag > span {
+            padding: 0 5px;
+            color: #fff;
+            text-shadow: none !important;
+        }
+
+        .size-num {
+            color: #000 !important;
+            line-height: 1;
+        }
+
+        .size-g {
+            background: #289a1b;
+        }
+
+        .size-m {
+            background: #176974;
+        }
+
+        .size-k {
+            background: #731f6c;
+        }
+
+        .size-b {
+            background: #010105;
+        }
+
+        .unable {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .item-magnet-btn:hover {
+            rotate: 180deg;
+            transition: all 0.2s;
+        }
+
+        .item-magnet-btn a {
+            display: inline-block;
+            padding: 3px 8px;
+        }
 
     </style>
 </head>
@@ -103,164 +181,363 @@
 
 <script>
 
-    /**
-     * dom选择
-     */
-    const el = (selector) => document.querySelector(selector)
-    const elAll = (selector) => document.querySelectorAll(selector)
+  let sword = ["爱女人", "爱液", "按摩棒", "拔出来", "爆草", "包二奶", "暴干", "暴奸", "暴乳", "爆乳", "暴淫", "屄", "被操", "被插", "被干", "逼奸", "仓井空", "插暴", "操逼", "操黑", "操烂", "肏你", "肏死", "操死", "操我", "厕奴", "插比", "插b", "插逼", "插进", "插你", "插我", "插阴", "潮吹", "潮喷", "成人dv", "成人电影", "成人论坛", "成人小说", "成人电", "成人电影", "成人卡通", "成人聊", "成人片", "成人视", "成人图", "成人文", "成人小", "成人电影", "成人论坛", "成人色情", "成人网站", "成人文学", "成人小说", "艳情小说", "成人游戏", "吃精", "赤裸", "抽插", "扌由插", "抽一插", "春药", "大波", "大力抽送", "大乳", "荡妇", "荡女", "盗撮", "多人轮", "发浪", "放尿", "肥逼", "粉穴", "封面女郎", "风月大陆", "干死你", "干穴", "肛交", "肛门", "龟头", "裹本", "国产av", "好嫩", "豪乳", "黑逼", "后庭", "后穴", "虎骑", "花花公子", "换妻俱乐部", "黄片", "几吧", "鸡吧", "鸡巴", "鸡奸", "寂寞男", "寂寞女", "妓女", "激情", "集体淫", "奸情", "叫床", "脚交", "金鳞岂是池中物", "金麟岂是池中物", "精液", "就去日", "巨屌", "菊花洞", "菊门", "巨奶", "巨乳", "菊穴", "开苞", "口爆", "口活", "口交", "口射", "口淫", "裤袜", "狂操", "狂插", "浪逼", "浪妇", "浪叫", "浪女", "狼友", "聊性", "流淫", "铃木麻", "凌辱", "漏乳", "露b", "乱交", "乱伦", "轮暴", "轮操", "轮奸", "裸陪", "买春", "美逼", "美少妇", "美乳", "美腿", "美穴", "美幼", "秘唇", "迷奸", "密穴", "蜜穴", "蜜液", "摸奶", "摸胸", "母奸", "奈美", "奶子", "男奴", "内射", "嫩逼", "嫩女", "嫩穴", "捏弄", "女优", "炮友", "砲友", "喷精", "屁眼", "品香堂", "前凸后翘", "强jian", "强暴", "强奸处女", "情趣用品", "情色", "拳交", "全裸", "群交", "惹火身材", "人妻", "人兽", "日逼", "日烂", "肉棒", "肉逼", "肉唇", "肉洞", "肉缝", "肉棍", "肉茎", "肉具", "揉乳", "肉穴", "肉欲", "乳爆", "乳房", "乳沟", "乳交", "乳头", "三级片", "骚逼", "骚比", "骚女", "骚水", "骚穴", "色逼", "色界", "色猫", "色盟", "色情网站", "色区", "色色", "色诱", "色欲", "色b", "少年阿宾", "少修正", "射爽", "射颜", "食精", "释欲", "兽奸", "兽交", "手淫", "兽欲", "熟妇", "熟母", "熟女", "爽片", "爽死我了", "双臀", "死逼", "丝袜", "丝诱", "松岛枫", "酥痒", "汤加丽", "套弄", "体奸", "体位", "舔脚", "舔阴", "调教", "偷欢", "偷拍", "推油", "脱内裤", "文做", "我就色", "无码", "舞女", "无修正", "吸精", "夏川纯", "相奸", "小逼", "校鸡", "小穴", "小xue", "写真", "性感妖娆", "性感诱惑", "性虎", "性饥渴", "性技巧", "性交", "性奴", "性虐", "性息", "性欲", "胸推", "穴口", "学生妹", "穴图", "亚情", "颜射", "阳具", "杨思敏", "要射了", "夜勤病栋", "一本道", "一夜欢", "一夜情", "一ye情", "阴部", "淫虫", "阴唇", "淫荡", "阴道", "淫电影", "阴阜", "淫妇", "淫河", "阴核", "阴户", "淫贱", "淫叫", "淫教师", "阴茎", "阴精", "淫浪", "淫媚", "淫糜", "淫魔", "淫母", "淫女", "淫虐", "淫妻", "淫情", "淫色", "淫声浪语", "淫兽学园", "淫书", "淫术炼金士", "淫水", "淫娃", "淫威", "淫亵", "淫样", "淫液", "淫照", "阴b", "应召", "幼交", "幼男", "幼女", "欲火", "欲女", "玉女心经", "玉蒲团", "玉乳", "欲仙欲死", "玉穴", "援交", "原味内衣", "援助交际", "张筱雨", "招鸡", "招妓", "中年美妇", "抓胸", "自拍", "自慰", "作爱", "18禁", "99bb", "a4u", "a4y", "adult", "amateur", "anal", "a片", "fuck", "gay片", "g点", "g片", "hardcore", "h动画", "h动漫", "incest", "porn", "secom", "sexinsex", "sm女王", "xiao77", "xing伴侣", "tokyohot", "yin荡", "贱人", "装b", "大sb", "傻逼", "傻b", "煞逼", "煞笔", "刹笔", "傻比", "沙比", "欠干", "婊子养的", "我日你", "我操", "我草", "卧艹", "卧槽", "爆你菊", "艹你", "cao你", "你他妈", "真他妈", "别他吗", "草你吗", "草你丫", "操你妈", "擦你妈", "操你娘", "操他妈", "日你妈", "干你妈", "干你娘", "娘西皮", "狗操", "狗草", "狗杂种", "狗日的", "操你祖宗", "操你全家", "操你大爷", "妈逼", "你麻痹", "麻痹的", "妈了个逼", "马勒", "狗娘养", "贱比", "贱b", "婊子", "贱货", "人渣", "混蛋", "媚外", "和弦", "兼职", "限量", "铃声", "性伴侣", "男公关", "火辣", "精子", "射精", "诱奸", "强奸", "做爱", "性爱", "发生关系", "按摩", "快感", "处男", "猛男", "少妇", "屌", "屁股", "下体", "a片", "内裤", "浑圆", "咪咪", "发情", "刺激", "白嫩", "粉嫩", "兽性", "风骚", "呻吟", "阉割", "高潮", "裸露", "脱光", "干你", "干死", "我干", "裙中性运动", "乱奸", "乱伦", "乱伦类", "乱伦小", "伦理大", "伦理电影", "伦理毛", "伦理片", "裸聊", "裸聊网", "裸体写真", "裸舞视", "裸照", "美女裸体", "美女写真", "美女上门", "美艳少妇", "妹按摩", "妹上门", "迷幻药", "迷幻藥", "迷昏口", "迷昏药", "迷昏藥", "迷魂香", "迷魂药", "迷魂藥", "迷奸粉", "迷奸药", "迷情粉", "迷情水", "迷情药", "迷药", "迷藥", "谜奸药", "骚妇", "骚货", "骚浪", "骚女", "骚嘴", "色电影", "色妹妹", "色情表演", "色情电影", "色情服务", "色情图片", "色情小说", "色情影片", "色情表演", "色情电影", "色情服务", "色情片", "色视频", "色小说", "性伴侣", "性服务", "性福情", "性感少", "性伙伴", "性交", "性交视频", "性交图片", "性奴", "性奴集中营", "性虐", "阴唇", "阴道", "阴蒂", "阴户", "阴间来电", "阴茎", "阴茎增大", "阴茎助勃", "阴毛", "陰唇", "陰道", "陰戶", "淫荡", "淫荡美女", "淫荡视频", "淫荡照片", "淫乱", "淫靡", "淫魔", "淫魔舞", "淫女", "淫情女", "淫肉", "淫騷妹", "淫兽", "淫兽学", "淫水", "淫穴", "morphine", "摇头丸", "迷药", "乖乖粉", "narcotic", "麻醉药", "精神药品", "爱女人", "爱液", "按摩棒", "拔出来", "爆草", "包二奶", "暴干", "暴奸", "暴乳", "爆乳", "暴淫", "屄", "被操", "被插", "被干", "逼奸", "仓井空", "插暴", "操逼", "操黑", "操烂", "肏你", "肏死", "操死", "操我", "厕奴", "插比", "插b", "插逼", "插进", "插你", "插我", "插阴", "潮吹", "潮喷", "成人电影", "成人论坛", "成人色情", "成人网站", "成人文学", "成人小说", "艳情小说", "成人游戏", "吃精", "赤裸", "抽插", "扌由插", "抽一插", "春药", "大波", "大力抽送", "大乳", "荡妇", "荡女", "盗撮", "多人轮", "发浪", "放尿", "肥逼", "粉穴", "封面女郎", "风月大陆", "干死你", "干穴", "肛交", "肛门", "龟头", "裹本", "国产av", "好嫩", "豪乳", "黑逼", "后庭", "后穴", "虎骑", "花花公子", "换妻俱乐部", "黄片", "几吧", "鸡吧", "鸡巴", "鸡奸", "寂寞男", "寂寞女", "妓女", "激情", "集体淫", "奸情", "叫床", "脚交", "金鳞岂是池中物", "金麟岂是池中物", "精液", "就去日", "巨屌", "菊花洞", "菊门", "巨奶", "巨乳", "菊穴", "开苞", "口爆", "口活", "口交", "口射", "口淫", "裤袜", "狂操", "狂插", "浪逼", "浪妇", "浪叫", "浪女", "狼友", "聊性", "流淫", "铃木麻", "凌辱", "漏乳", "露b", "乱交", "乱伦", "轮暴", "轮操", "轮奸", "裸陪", "买春", "美逼", "美少妇", "美乳", "美腿", "美穴", "美幼", "秘唇", "迷奸", "密穴", "蜜穴", "蜜液", "摸奶", "摸胸", "母奸", "奈美", "奶子", "男奴", "内射", "嫩逼", "嫩女", "嫩穴", "捏弄", "女优", "炮友", "砲友", "喷精", "屁眼", "品香堂", "前凸后翘", "强jian", "强暴", "强奸处女", "情趣用品", "情色", "拳交", "全裸", "群交", "惹火身材", "人妻", "人兽", "日逼", "日烂", "肉棒", "肉逼", "肉唇", "肉洞", "肉缝", "肉棍", "肉茎", "肉具", "揉乳", "肉穴", "肉欲", "乳爆", "乳房", "乳沟", "乳交", "乳头", "三级片", "骚逼", "骚比", "骚女", "骚水", "骚穴", "色逼", "色界", "色猫", "色盟", "色情网站", "色区", "色色", "色诱", "色欲", "色b", "少年阿宾", "少修正", "射爽", "射颜", "食精", "释欲", "兽奸", "兽交", "手淫", "兽欲", "熟妇", "熟母", "熟女", "爽片", "爽死我了", "双臀", "死逼", "丝袜", "丝诱", "松岛枫", "酥痒", "汤加丽", "套弄", "体奸", "体位", "舔脚", "舔阴", "调教", "偷欢", "偷拍", "推油", "脱内裤", "文做", "我就色", "无码", "舞女", "无修正", "吸精", "夏川纯", "相奸", "小逼", "校鸡", "小穴", "小xue", "写真", "性感妖娆", "性感诱惑", "性虎", "性饥渴", "性技巧", "性交", "性奴", "性虐", "性息", "性欲", "胸推", "穴口", "学生妹", "穴图", "亚情", "颜射", "阳具", "杨思敏", "要射了", "夜勤病栋", "一本道", "一夜欢", "一夜情", "一ye情", "阴部", "淫虫", "阴唇", "淫荡", "阴道", "淫电影", "阴阜", "淫妇", "淫河", "阴核", "阴户", "淫贱", "淫叫", "淫教师", "阴茎", "阴精", "淫浪", "淫媚", "淫糜", "淫魔", "淫母", "淫女", "淫虐", "淫妻", "淫情", "淫色", "淫声浪语", "淫兽学园", "淫书", "淫术炼金士", "淫水", "淫娃", "淫威", "淫亵", "淫样", "淫液", "淫照", "阴b", "应召", "幼交", "幼男", "幼女", "欲火", "欲女", "玉女心经", "玉蒲团", "玉乳", "欲仙欲死", "玉穴", "援交", "原味内衣", "援助交际", "张筱雨", "招鸡", "招妓", "中年美妇", "抓胸", "自拍", "自慰", "作爱", "18禁", "99bb", "a4u", "a4y", "adult", "amateur", "anal", "a片", "fuck", "gay片", "g点", "g片", "hardcore", "h动画", "h动漫", "incest", "porn", "secom", "sexinsex", "sm女王", "xiao77", "xing伴侣", "tokyohot", "yin荡",
+    "脫衣舞", "第一會所", "第一会所", "sex8", "SEX8", "未 成 年", "未成年", "草榴", "嫩B", "嫩b", "玩3P", "玩3p", "奶女神", "奸杀", "無碼", "全套福利", "虐肛", "约炮", "厕拍"]
 
-    /**
-     * 事件绑定
-     */
-    const bindEvent = (selector, event, func) => {
-        const nodeList = elAll(selector)
-        if (!nodeList || nodeList.length === 0) {
-            bindEventForce(selector, event, func)
+  /**
+   * dom选择
+   */
+  const el = (selector) => document.querySelector(selector)
+  const elAll = (selector) => document.querySelectorAll(selector)
+
+  /**
+   * 事件绑定
+   */
+  const bindEvent = (selector, event, func) => {
+    const nodeList = elAll(selector)
+    if (!nodeList || nodeList.length === 0) {
+      bindEventForce(selector, event, func)
+    } else {
+      let eventList = event.split(' ').map(e => e.trim())
+      for (let i = 0; i < nodeList.length; i++) {
+        const node = nodeList[i];
+        for (let i1 = 0; i1 < eventList.length; i1++) {
+          const e = eventList[i1];
+          node.addEventListener(e, func, false);
+        }
+      }
+    }
+  }
+
+  /**
+   * 事件绑定委托，默认使用document处理event
+   */
+  const bindEventForce = function (selector, event, func, delegation) {
+    let eventList = event.split(' ').map(e => e.trim())
+    for (let i = 0; i < eventList.length; i++) {
+      const e = eventList[i];
+      (delegation ? el(delegation) : document).addEventListener(e, (_e) => {
+        const _list = elAll(selector)
+        for (let i1 = 0; i1 < _list.length; i1++) {
+          const item = _list[i1];
+          (_e.target === item || item.contains(_e.target)) && func.call(item, _e, item);
+        }
+      }, false)
+    }
+  }
+
+  /**
+   * 显示切换
+   */
+  const toggle = function (selector, displayType = 'block', showCallback, hideCallback) {
+    let _this = typeof selector === 'string' ? el(selector) : selector
+    let isHide = window.getComputedStyle(_this).display === 'none'
+    if (isHide) {
+      _this.style.display = displayType
+      showCallback && showCallback()
+    } else {
+      _this.style.display = 'none'
+      hideCallback && hideCallback()
+    }
+  }
+
+  /**
+   * 异步请求 get
+   */
+  const get = function (url, data) {
+    return new Promise((resolve, reject) => {
+      let xhr = new XMLHttpRequest();
+      if (data) {
+        url = url + '?' + Object.keys(data).map(key => `${key}=${data[key]}`).join('&')
+      }
+      xhr.open('GET', url, true);
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status >= 200 && xhr.status < 400) {
+            if (xhr.responseText
+              && (xhr.responseText.charAt(0) === '[' || xhr.responseText.charAt(0) === '{')) {
+              let result = JSON.parse(xhr.responseText)
+              resolve(result);
+            } else {
+              resolve(xhr.responseText)
+            }
+          } else {
+            reject ? reject() : alert("请求失败！！！")
+          }
+        }
+      }
+      xhr.send(null);
+    })
+  }
+
+  /**
+   * 异步请求 post
+   */
+  const post = function (url, data) {
+    return new Promise((resolve, reject) => {
+      let xhr = new XMLHttpRequest();
+      xhr.open('POST', url, true);
+      xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4) {
+          if (xhr.status >= 200 && xhr.status < 400) {
+            if (xhr.responseText
+              && (xhr.responseText.charAt(0) === '[' || xhr.responseText.charAt(0)) === '{') {
+              let result = JSON.parse(xhr.responseText)
+              resolve(result);
+            } else {
+              resolve(xhr.responseText)
+            }
+          } else {
+            reject ? reject() : alert("请求失败！！！")
+          }
+        }
+      }
+      xhr.send(JSON.stringify(data));
+    })
+  }
+
+  const sizeFixed = function (rawSize) {
+    if (rawSize >= 1024 * 1024 * 1024) {
+      return (rawSize / 1024 / 1024 / 1024).toFixed(2) + "G"
+    } else if (rawSize >= 1024 * 1024) {
+      return (rawSize / 1024 / 1024).toFixed(2) + "M"
+    } else if (rawSize >= 1024) {
+      return ~~(rawSize / 1024) + "K"
+    }
+
+    return rawSize;
+  }
+
+  const totalSize = function (r) {
+    if (r.length) {
+      return sizeFixed(r.length)
+    } else {
+      let length = JSON.parse(r.files === 'null' ? '[]' : r.files)
+        .filter(x => !(x.path[0].startsWith("_____padding_file_")))
+        .map(x => x.length).reduce((a, b) => a + b);
+      return sizeFixed(length)
+    }
+  }
+
+  const totalSizeWithTag = function (r) {
+    let size
+    if (r.length) {
+      size = sizeFixed(r.length)
+    } else {
+      let length = JSON.parse(r.files === 'null' ? '[]' : r.files)
+        .filter(x => !(x.path[0].startsWith("_____padding_file_")))
+        .map(x => x.length).reduce((a, b) => a + b);
+      size = sizeFixed(length)
+    }
+    if (size.endsWith("G")) {
+      return `<span class="size-tag"><span class="size-num">${size.substring(0, size.length - 1)}</span><span class="size-g">${size.substring(size.length - 1)}</span></span>`
+    } else if (size.endsWith("M")) {
+      return `<span class="size-tag"><span class="size-num">${size.substring(0, size.length - 1)}</span><span class="size-m">${size.substring(size.length - 1)}</span></span>`
+    } else if (size.endsWith("K")) {
+      return `<span class="size-tag"><span class="size-num">${size.substring(0, size.length - 1)}</span><span class="size-k">${size.substring(size.length - 1)}</span></span>`
+    } else {
+      return `<span class="size-tag"><span class="size-num">${size}</span><span class="size-b">B</span></span>`
+    }
+  }
+
+  const groupFile = function (dataList) {
+    dataList = dataList.filter(x => !(x.path[0].startsWith("_____padding_file_")))
+
+    let root = {
+      "type": 1,
+      "length": 0,
+      "path": "",
+      "fullPath": "",
+      "depth": 0,
+      "suffix": "",
+      "children": []
+    }
+
+    let pathMap = {"": root}
+
+    dataList.forEach(data => {
+      // 多级目录，需要拼接
+      data.path.forEach((_p, _i) => {
+        let exist = pathMap[root.fullPath + "/" + data.path.slice(0, _i + 1).join("/")]
+        if (exist) {
+          // 路径已存在，必然为文件夹，文件本身不应该重复
+          // 跳过
+
         } else {
-            let eventList = event.split(' ').map(e => e.trim())
-            for (let i = 0; i < nodeList.length; i++) {
-                const node = nodeList[i];
-                for (let i1 = 0; i1 < eventList.length; i1++) {
-                    const e = eventList[i1];
-                    node.addEventListener(e, func, false);
-                }
+          // 路径不存在
+          if (_i === data.path.length - 1) {
+            // 最后一个节点为文件
+            let node = {
+              "type": 0,
+              "length": data.length,
+              "path": _p,
+              "fullPath": root.fullPath + "/" + data.path.slice(0, _i + 1).join("/"),
+              "suffix": _p.includes(".") ? _p.substring(_p.lastIndexOf(".") + 1) : "default",
+              "children": []
             }
+            let parentPath = _i === 0 ? root.path : (root.fullPath + "/" + data.path.slice(0, _i).join("/"))
+            let pNode = pathMap[parentPath]
+            pNode.type = 1
+            node.depth = pNode.depth + 1
+
+            pNode.children.push(node)
+            pathMap[node.fullPath] = node
+            // 父节点叠加文件大小
+            let pathMetas = parentPath.split("/");
+            pathMetas.forEach((_thisPath, _thisIdx) => {
+              let _path = pathMetas.slice(0, _thisIdx + 1).join("/")
+              pathMap[_path].length = (pathMap[_path].length || 0) + node.length
+            })
+
+          } else {
+            // 文件夹
+            let node = {
+              "type": 1,
+              "length": 0,
+              "path": _p,
+              "fullPath": root.fullPath + "/" + data.path.slice(0, _i + 1).join("/"),
+              "suffix": "",
+              "children": []
+            }
+            let parentPath = _i === 0 ? root.path : (root.fullPath + "/" + data.path.slice(0, _i).join("/"))
+            let pNode = pathMap[parentPath]
+            pNode.type = 1
+            node.depth = pNode.depth + 1
+
+            pNode.children.push(node)
+            pathMap[node.fullPath] = node
+          }
         }
+      })
+    })
+
+    // 重新排序
+    let resort = (node) => {
+      if (!node) return
+      if (node.children) {
+        node.children.sort(x => x.path)
+        node.children.forEach(cNode => resort(cNode))
+      }
     }
 
-    /**
-     * 事件绑定委托，默认使用document处理event
-     */
-    const bindEventForce = function (selector, event, func, delegation) {
-        let eventList = event.split(' ').map(e => e.trim())
-        for (let i = 0; i < eventList.length; i++) {
-            const e = eventList[i];
-            (delegation ? el(delegation) : document).addEventListener(e, (_e) => {
-                const _list = elAll(selector)
-                for (let i1 = 0; i1 < _list.length; i1++) {
-                    const item = _list[i1];
-                    (_e.target === item || item.contains(_e.target)) && func.call(item, _e, item);
-                }
-            }, false)
-        }
+    resort(root)
+
+    // console.log(root)
+
+    let fileIcons = {
+      "": "📁",
+      "default": "📄",
+      "txt": "📄",
+      "info": "📋",
+      "nfo": "📋",
+      "url": "🌍",
+      "mp4": "🎬",
+      "mkv": "🎬",
+      "avi": "🎬",
+      "rmvb": "🎬",
+      "wmv": "🎬",
+      "flv": "🎬",
+      "m4v": "🎬",
+      "iso": "💿",
+      "wav": "🎵",
+      "mp3": "🎵",
+      "m4a": "🎵",
+      "flac": "🎵",
+      "dsf": "🎵",
+      "jpg": "🎴",
+      "png": "🎴",
+      "jpeg": "🎴",
+      "epub": "📗",
+      "pdf": "📑",
+      "zip": "💼",
+      "rar": "💼",
+      "7z": "💼",
+      "tar": "💼",
+      "gz": "💼",
     }
 
-    /**
-     * 显示切换
-     */
-    const toggle = function (selector, displayType = 'block') {
-        let isHide = window.getComputedStyle(el(selector)).display === 'none'
-        if (isHide) {
-            el(selector).style.display = displayType
-        } else {
-            el(selector).style.display = 'none'
-        }
+    let renderDetail = (node) => {
+      let html = "";
+      if (!node) {
+        return html
+      }
+      return `<div class="detail-meta">
+                   <div class="detail-this  ${node.type ? 'click-able' : ''}">
+                    <div class="detail-title" style="padding-left: ${node.depth * 20 - 20}px">${node.type ? "📁 " : (fileIcons[node.suffix.toLowerCase()] || "📄") + " "  }${node.path}</div>
+                    <div class="detail-size">${sizeFixed(node.length)} </div>
+                   </div>
+                   <div class="detail-next hide">${node.children.map(_node => renderDetail(_node)).join("")}</div>
+                </div>`
     }
 
-    /**
-     * 异步请求 get
-     */
-    const get = function (url, data) {
-        return new Promise((resolve, reject) => {
-            let xhr = new XMLHttpRequest();
-            if (data) {
-                url = url + '?' + Object.keys(data).map(key => `${key}=${data[key]}`).join('&')
-            }
-            xhr.open('GET', url, true);
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                    if (xhr.status >= 200 && xhr.status < 400) {
-                        if (xhr.responseText
-                            && (xhr.responseText.charAt(0) === '[' || xhr.responseText.charAt(0) === '{')) {
-                            let result = JSON.parse(xhr.responseText)
-                            resolve(result);
-                        } else {
-                            resolve(xhr.responseText)
-                        }
-                    } else {
-                        reject ? reject() : alert("请求失败！！！")
-                    }
-                }
-            }
-            xhr.send(null);
-        })
-    }
+    return root.children.map(x => renderDetail(x)).join("")
+  }
 
-    /**
-     * 异步请求 post
-     */
-    const post = function (url, data) {
-        return new Promise((resolve, reject) => {
-            let xhr = new XMLHttpRequest();
-            xhr.open('POST', url, true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4) {
-                    if (xhr.status >= 200 && xhr.status < 400) {
-                        if (xhr.responseText
-                            && (xhr.responseText.charAt(0) === '[' || xhr.responseText.charAt(0)) === '{') {
-                            let result = JSON.parse(xhr.responseText)
-                            resolve(result);
-                        } else {
-                            resolve(xhr.responseText)
-                        }
-                    } else {
-                        reject ? reject() : alert("请求失败！！！")
-                    }
-                }
-            }
-            xhr.send(JSON.stringify(data));
-        })
+  const sensitiveWord = function (raw) {
+    if (!raw) {
+      return false;
     }
-
-    const sizeFixed = function (rawSize) {
-        if (rawSize >= 1024 * 1024 * 1024) {
-            return ~~(rawSize / 1024 / 1024 / 1024) + "G"
-        } else if (rawSize >= 1024 * 1024) {
-            return ~~(rawSize / 1024 / 1024) + "M"
-        } else if (rawSize >= 1024) {
-            return ~~(rawSize / 1024) + "K"
-        } 
-        
-        return rawSize;
+    for (let i = 0; i < sword.length; i++) {
+      if (new RegExp(`(\\.|^|\s)${sword[i]}(\\.|$|\s)`).test(raw)) {
+        // console.log(sword[i])
+        debugger
+        return true;
+      }
     }
+    return false
+  }
 
-    bindEvent(".search-input", "keydown", (e, _from) => {
-        console.log(e.target)
-        let value = e.target.value
-        if (e.key !== 'Enter') return
-        if (value) {
-            get('/api/list_torrents', {keyword: value})
-                .then(res => {
-                    el('.result-list').innerHTML = res.map((r, idx) => `<div class="list-item">
-                <div class="item-title">${r.file_name}</div>
+  let current_list = []
+
+  bindEvent(".search-input", "keydown", (e, _from) => {
+    let value = e.target.value
+    if (e.key !== 'Enter') return
+    if (value) {
+      get('/api/list_torrents', {keyword: value})
+        .then(res => {
+          current_list = res
+          el('.result-list').innerHTML = res.map((r, idx) => `<div class="list-item">
+                <div class="item-title item-title-${r.info_hash} ${sensitiveWord(r.file_name) ? "cover" : ""}">
+                    ${totalSizeWithTag(r)} ${r.file_name}
+                </div>
                 <div class="item-btn">
                     <div class="item-magnet-btn"><a
-                            href="magnet:?xt=urn:btih:${r.info_hash}">点击下载</a></div>
-                    <div class="item-detail-btn" data-idx="${idx}">查看详情</div>
+                            href="magnet:?xt=urn:btih:${r.info_hash}&dn=${r.file_name}&tr=http://1337.abcvg.info:80/announce&tr=http://bt.endpot.com:80/announce&tr=http://bt.okmp3.ru:2710/announce&tr=http://li2021-95.members.linode.com:6969/announce&tr=http://nyaa.tracker.wf:7777/announce&tr=http://open.acgnxtracker.com:80/announce&tr=http://p2p.0g.cx:6969/announce&tr=http://share.camoe.cn:8080/announce&tr=http://t.acg.rip:6699/announce&tr=http://t.nyaatracker.com:80/announce&tr=http://torrentsmd.com:8080/announce&tr=http://tracker.bt4g.com:2095/announce&tr=http://tracker.electro-torrent.pl:80/announce&tr=http://tracker.files.fm:6969/announce&tr=http://tracker.gbitt.info:80/announce&tr=http://tracker.mywaifu.best:6969/announce&tr=http://tracker.renfei.net:8080/announce&tr=http://tracker.skyts.net:6969/announce&tr=http://tracker.tfile.co:80/announce&tr=http://v6-tracker.0g.cx:6969/announce&tr=http://www.all4nothin.net:80/announce.php&tr=http://www.wareztorrent.com:80/announce&tr=https://1337.abcvg.info:443/announce&tr=https://tr.burnabyhighstar.com:443/announce&tr=https://tracker.bangumi.zip:443/announce&tr=https://tracker.foreverpirates.co:443/announce&tr=https://tracker.gbitt.info:443/announce&tr=https://tracker.jiesen.life:8443/announce&tr=https://tracker.kuroy.me:443/announce&tr=https://tracker.lilithraws.cf:443/announce&tr=https://tracker.lilithraws.org:443/announce&tr=https://tracker.loligirl.cn:443/announce&tr=https://tracker.tamersunion.org:443/announce&tr=https://tracker1.520.jp:443/announce&tr=https://trackers.mlsub.net:443/announce&tr=udp://1c.premierzal.ru:6969/announce&tr=udp://6.pocketnet.app:6969/announce&tr=udp://6ahddutb1ucc3cp.ru:6969/announce&tr=udp://aarsen.me:6969/announce&tr=udp://acxx.de:6969/announce&tr=udp://anzix.net:6969/announce&tr=udp://bt1.archive.org:6969/announce&tr=udp://d40969.acod.regrucolo.ru:6969/announce&tr=udp://ec2-18-191-163-220.us-east-2.compute.amazonaws.com:6969/announce&tr=udp://epider.me:6969/announce&tr=udp://exodus.desync.com:6969/announce&tr=udp://free.publictracker.xyz:6969/announce&tr=udp://globalwave.no-ip.org:6969/announce&tr=udp://ipv6.fuuuuuck.com:6969/announce&tr=udp://mail.segso.net:6969/announce&tr=udp://market-re.quest:6969/announce&tr=udp://mikrotik2.draatman.net:6969/announce&tr=udp://moonburrow.club:6969/announce&tr=udp://movies.zsw.ca:6969/announce&tr=udp://odd-hd.fr:6969/announce&tr=udp://oh.fuuuuuck.com:6969/announce&tr=udp://open.demonii.com:1337/announce&tr=udp://open.dstud.io:6969/announce&tr=udp://open.free-tracker.ga:6969/announce&tr=udp://open.publictracker.xyz:6969/announce&tr=udp://open.stealth.si:80/announce&tr=udp://open.tracker.ink:6969/announce&tr=udp://opentor.org:2710/announce&tr=udp://opentracker.io:6969/announce&tr=udp://p4p.arenabg.com:1337/announce&tr=udp://private.anonseed.com:6969/announce&tr=udp://public-tracker.cf:6969/announce&tr=udp://retracker.hotplug.ru:2710/announce&tr=udp://retracker01-msk-virt.corbina.net:80/announce&tr=udp://run-2.publictracker.xyz:6969/announce&tr=udp://run.publictracker.xyz:6969/announce&tr=udp://sanincode.com:6969/announce&tr=udp://soundmovie.ru:6969/announce&tr=udp://static.54.161.216.95.clients.your-server.de:6969/announce&tr=udp://su-data.com:6969/announce&tr=udp://sx.xxtor.com:6969/announce&tr=udp://t.133335.xyz:6969/announce&tr=udp://tamas3.ynh.fr:6969/announce&tr=udp://thetracker.org:80/announce&tr=udp://thouvenin.cloud:6969/announce&tr=udp://tk1.trackerservers.com:8080/announce&tr=udp://tk1v6.trackerservers.com:8080/announce&tr=udp://tracker-udp.gbitt.info:80/announce&tr=udp://tracker.0x7c0.com:6969/announce&tr=udp://tracker.4.babico.name.tr:3131/announce&tr=udp://tracker.6.babico.name.tr:6969/announce&tr=udp://tracker.birkenwald.de:6969/announce&tr=udp://tracker.ccp.ovh:6969/announce&tr=udp://tracker.cyberia.is:6969/announce&tr=udp://tracker.dler.com:6969/announce&tr=udp://tracker.doko.moe:6969/announce&tr=udp://tracker.leech.ie:1337/announce&tr=udp://tracker.moeking.me:6969/announce&tr=udp://tracker.openbittorrent.com:6969/announce&tr=udp://tracker.opentrackr.org:1337/announce&tr=udp://tracker.skyts.net:6969/announce&tr=udp://tracker.t-rb.org:6969/announce&tr=udp://tracker.therarbg.com:6969/announce&tr=udp://tracker.tiny-vps.com:6969/announce&tr=udp://tracker.torrent.eu.org:451/announce&tr=udp://tracker.tryhackx.org:6969/announce&tr=udp://tracker1.bt.moack.co.kr:80/announce&tr=udp://tracker2.dler.com:80/announce&tr=udp://ttk2.nbaonlineservice.com:6969/announce&tr=udp://u4.trakx.crim.ist:1337/announce&tr=udp://uploads.gamecoast.net:6969/announce&tr=udp://vm3268418.24ssd.had.wf:6969/announce&tr=udp://wepzone.net:6969/announce&tr=udp://yahor.of.by:6969/announce&tr=ws://hub.bugout.link:80/announce&tr=wss://tracker.openwebtorrent.com:443/announce">🧲</a></div>
+                    <div class="item-detail-btn ${(r.files && r.files !== 'null')? "" : "unable"}" data-idx="${idx}">查看详情</div>
                 </div>
             </div>
             <div class="item-detail item-detail-${idx} hide">
-                    ${JSON.parse(r.files === 'null' ? '[]' : r.files).map(f => `
-                <div class="detail-meta">
-                    <div class="detail-title">${f.path[0]}</div>
-                    <div class="detail-size">${sizeFixed(f.length)}</div>
-                </div>
-                    
-                    `).join('\n')}
             </div>
 `).join("\n")
-                })
+        })
 
-        } else {
-            el('.result-list').innerHTML = ''
-        }
+    } else {
+      el('.result-list').innerHTML = ''
+    }
 
+  })
+
+  bindEvent(".item-detail-btn", "click", (e, _from) => {
+    let idx = e.target.dataset.idx
+    let detailDom = el(`.item-detail-${idx}`)
+    if (!detailDom.classList.contains("init")) {
+      detailDom.classList.add("init")
+      detailDom.innerHTML = groupFile(JSON.parse(current_list[idx].files === 'null' ? '[]' : current_list[idx].files))
+    }
+    toggle(`.item-detail-${e.target.dataset.idx}`)
+  })
+
+
+  bindEvent(".detail-this", "click", (e, _from) => {
+    toggle(_from.nextElementSibling, 'block', () => {
+      let title = _from.querySelector('.detail-title').innerText;
+      _from.querySelector('.detail-title').innerText = title.replace('📁', '📂')
+    }, () => {
+      let title = _from.querySelector('.detail-title').innerText;
+      _from.querySelector('.detail-title').innerText = title.replace('📂', '📁')
     })
-
-    bindEvent(".item-detail-btn", "click", (e, _from) => {
-        toggle(`.item-detail-${e.target.dataset.idx}`)
-    })
+  })
 
 
 </script>

@@ -43,11 +43,13 @@ func main() {
 		}
 		//fmt.Println(string(a))
 		torrent := Torrent{}
-		if err := json.Unmarshal(a, &torrent); err == nil {
-			//fmt.Println(torrent)
-			insert(torrent)
-		} else {
-			fmt.Println(err)
+		if len(a) > 0 {
+			if err := json.Unmarshal(a, &torrent); err == nil {
+				//fmt.Println(torrent)
+				insert(torrent)
+			} else {
+				fmt.Println(err)
+			}
 		}
 	}
 

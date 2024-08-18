@@ -80,9 +80,11 @@ func NewStandardConfig() *Config {
 		Network:     "udp4",
 		Address:     ":6881",
 		PrimeNodes: []string{
-			"router.bittorrent.com:6881",
-			"router.utorrent.com:6881",
+			"dht.libtorrent.org:25401",   // "185.157.221.247:25401",
+			"router.bittorrent.com:6881", // "67.215.246.10:6881",
+			"router.utorrent.com:6881",   // "82.221.103.244:6881",
 			"dht.transmissionbt.com:6881",
+			"dht.aelitis.com:6881",
 		},
 		NodeExpriedAfter:     time.Duration(time.Minute * 15),
 		KBucketExpiredAfter:  time.Duration(time.Minute * 15),
