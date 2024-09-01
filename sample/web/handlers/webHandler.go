@@ -22,9 +22,10 @@ type BaseRes struct {
 func ListTorrents(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	keyword := values.Get("keyword")
+	page := values.Get("page")
 
 	// 1. 查询数据库
-	torrents := handlers.ListByKeyword(keyword)
+	torrents := handlers.ListByKeyword(keyword, page)
 
 	jsonBytes, _ := json.Marshal(&torrents)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")

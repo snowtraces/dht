@@ -1,9 +1,11 @@
 package handlers
 
 import (
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"strings"
+	_ "github.com/mattn/go-sqlite3"
+	"log"
+	"regexp"
+	"strconv"
 )
 
 type BaseRes struct {
@@ -21,15 +23,24 @@ type Torrent struct {
 }
 
 // List 列出指定目录下所有文件
-func ListByKeyword(keyword string) []Torrent {
-	db, _ := sqlx.Open("mysql", "root:11521@tcp(localhost:3306)/dht")
+func ListByKeyword(keyword string, page string) []Torrent {
+	db, _ := sqlx.Open("sqlite3", "_torrent.db")
 	defer db.Close()
 
 	var torrents []Torrent
-	keyword = strings.ReplaceAll(keyword, " ", "%")
-	e := db.Select(&torrents, "select * from torrent where file_name like ? limit 30;", "%"+keyword+"%")
+	// 关键字
+	re := regexp.MustCompile(`[\s|.]+`)
+	keyword = re.ReplaceAllString(keyword, "%")
+	// page 为空判断
+	pageNo := 1
+	if page != "" {
+		pageNo, _ = strconv.Atoi(page)
+	}
+
+	e := db.Select(&torrents, "select * from torrent where file_name like ? limit "+strconv.Itoa((pageNo-1)*20)+",20;", "%"+keyword+"%")
 	if e != nil {
-		return nil
+		log.Println("Error: " + e.Error())
+		return make([]Torrent, 0)
 	}
 
 	if torrents == nil {

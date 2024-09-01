@@ -7,9 +7,9 @@ import (
 	"io"
 	"os"
 
-	//并不需要使用其API，只需要执行该包的init方法（加载MySQL是驱动程序）
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
+	//并不需要使用其API，只需要执行该包的init方法（加载MySQL是驱动程序）
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type Torrent struct {
@@ -24,11 +24,11 @@ var (
 )
 
 func main() {
-	db, _ = sqlx.Open("mysql", "root:11521@tcp(localhost:3306)/dht")
+	db, _ = sqlx.Open("sqlite3", "_torrent.db")
 	defer db.Close()
 
 	// 读取文件
-	fi, err := os.Open("C:\\Users\\snow\\go\\src\\github.com\\shiyanhui\\dht\\sample\\spider\\dht.log")
+	fi, err := os.Open("dht.log")
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
 		return
@@ -57,7 +57,7 @@ func main() {
 
 func insert(t Torrent) {
 	str, _ := json.Marshal(t.Files)
-	_, e := db.Exec("replace into torrent(info_hash, file_name, files, length) values(?, ?, ?, ?);", t.InfoHash, t.FileName, string(str), t.Length)
+	_, e := db.Exec("replace into torrent(info_hash, file_name, files, length, nsfw) values(?, ?, ?, ?, ?);", t.InfoHash, t.FileName, string(str), t.Length, 0)
 	if e != nil {
 		fmt.Println("err=", e, t.InfoHash)
 		return

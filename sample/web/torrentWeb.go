@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"github.com/gorilla/handlers"
 	"github.com/shiyanhui/dht/sample/web/routes"
 	"log"
@@ -11,14 +12,14 @@ func main() {
 	startWebServer("2046")
 }
 
-////go:embed static
-//var static embed.FS
+//go:embed static
+var static embed.FS
 
 func startWebServer(port string) {
 	r := routes.NewRouter()
 	http.Handle("/", r)
-	//r.Handle("/static/", http.FileServer(http.FS(static)))
-	r.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./sample/web/static/"))))
+	r.Handle("/static/", http.FileServer(http.FS(static)))
+	//r.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./sample/web/static/"))))
 
 	headersOk := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization", "*"})
 	originsOk := handlers.AllowedOrigins([]string{"*"})
